@@ -1,9 +1,13 @@
 import math
 
+
 class Point:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
 
 
 class Shape:
@@ -19,7 +23,11 @@ class Polygon(Shape):
         for i in range(len(self.points) - 1):
             area += (self.points[i + 1].x - self.points[i].x) * (self.points[i + 1].y + self.points[i].y) * 0.5
         area += (self.points[0].x - self.points[len(self.points) - 1].x) * (self.points[0].y + self.points[len(self.points) - 1].y) * 0.5
-        return area
+
+        if area < 0:
+            return -1 * area
+        else:
+            return area
 
     def get_perimeter(self):
         perimeter = 0
@@ -85,23 +93,3 @@ class Rectangle(Polygon):
             return 0
 
         return (right - left) * (top - bottom)
-
-
-points_1 = [
-    Point(1, 1),
-    Point(1, 8),
-    Point(4, 8),
-    Point(4, 1)
-]
-rect_1 = Rectangle(points_1)
-
-points_2 = [
-    Point(2, 2),
-    Point(2, 10),
-    Point(6, 10),
-    Point(6, 2)
-]
-rect_2 = Rectangle(points_2)
-
-print(rect_1.intersection_area(rect_2))
-print(rect_2.intersection_area(rect_1))

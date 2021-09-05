@@ -56,10 +56,10 @@ class Order:
         self.item = item
 
     def calc_tax(self):
-        return Payment(self.item.get_tax() * self.item.get_price())
+        return Payment(self.item.get_tax() * self.item.get_price() * self.order_detail.quantity)
 
     def calc_total(self):
-        return Payment((self.item.get_tax() + 1) * self.item.get_price())
+        return Payment((self.item.get_tax() + 1) * self.item.get_price() * self.order_detail.quantity)
 
 
 class Customer:
