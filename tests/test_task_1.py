@@ -4,7 +4,7 @@ import datetime
 
 
 class TestTask1(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.personal_infos = [
             PersonalInfo(1, 'Tara B. Anderson', '1799 Saint Clair Street', '662-595-9340',
                          'TaraBAnderson@jourrapide.com', 'Python Developer', 'Junior', 950),
@@ -81,7 +81,7 @@ class TestTask1(unittest.TestCase):
         self.devs[2].set_task(self.tasks[5])
         self.devs[3].set_task(self.tasks[1])
 
-    def test_tasks_to_date(self):
+    def test_tasks_to_date(self) -> None:
         self.assertEqual(self.devs[0].assignments[0].get_tasks_to_date(datetime.date(2021, 9, 25)),
                          [self.tasks[0]])
         self.assertEqual(self.devs[0].assignments[1].get_tasks_to_date(datetime.date(2021, 9, 25)),
