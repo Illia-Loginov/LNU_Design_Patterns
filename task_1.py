@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from abc import ABCMeta, abstractmethod
 import datetime
 from collections import defaultdict
+import copy
 
 ddl = defaultdict(list)
 
@@ -146,7 +147,7 @@ class Project(metaclass=ABCMeta):
         self.title = title
         self.start_date = start_date
         self.team = team
-        if project_id not in team.project_ids:
+        if team is not None and project_id not in team.project_ids:
             team.project_ids.append(project_id)
         self.task_list = []
         self.members = []
@@ -287,35 +288,93 @@ class ChiefTechnicalOfficer(TopManagement):
 
 
 class SolutionArchitect(TopManagement):
+    def __init__(self, personal_info: PersonalInfo) -> None:
+        super().__init__(personal_info)
+        self.web_app = WebApp(None, None, None, None, None)
+        self.mobile_app = MobileApp(None, None, None, None, None)
+
+    def set_name(self, project_id, title):
+        self.web_app.id = project_id
+        self.web_app.title = title + ' (Web)'
+        self.mobile_app.id = project_id
+        self.mobile_app.title = title + ' (Mobile)'
+
+    def set_requirements(self, start_date, team, cloud_platform, platforms):
+        self.web_app.start_date = start_date
+        self.web_app.team = team
+        if team is not None and self.web_app.id not in team.project_ids:
+            team.project_ids.append(self.web_app.id)
+        self.web_app.cloud_platform = cloud_platform
+
+        self.mobile_app.start_date = start_date
+        self.mobile_app.team = team
+        if team is not None and self.mobile_app.id not in team.project_ids:
+            team.project_ids.append(self.mobile_app.id)
+        self.mobile_app.platforms = platforms
+
+    def assign_developers(self, developers):
+        for developer in developers:
+            developer.assign(self.web_app)
+            developer.assign(self.mobile_app)
+
+    def create_deadlines(self, developers_tasks):
+        for developer in developers_tasks:
+            task_web = developers_tasks[developer]
+            task_mobile = copy.copy(task_web)
+            
+            task_web.related_project = self.web_app.title
+            task_mobile.related_project = self.mobile_app.title
+            
+            developer.set_task(task_web)
+            developer.set_task(task_mobile)
+
     def attach_project(self, *args) -> list[Project]:
-        project_id, title, start_date, team, cloud_platform, platforms = args
-        return [
-            WebApp(project_id, title, start_date, team, cloud_platform),
-            MobileApp(project_id, title, start_date, team, platforms),
-        ]
+        result = [self.web_app, self.mobile_app]
+        self.web_app = WebApp(None, None, None, None, None)
+        self.mobile_app = MobileApp(None, None, None, None, None)
+        return result
+
+
+class SeniorSolutionArchitect(TopManagement):
+    def create_project(self, *args):
+        solution_architect, project_id, title, start_date, team, cloud_platform, platforms, developers, developers_tasks = args
+        solution_architect.set_name(project_id, title)
+        solution_architect.set_requirements(start_date, team, cloud_platform, platforms)
+        solution_architect.assign_developers(developers)
+        solution_architect.create_deadlines(developers_tasks)
+
+        return solution_architect.attach_project()
+    
+    def attach_project(self, *args) -> list[Project]:
+        return self.create_project(*args)
 
 personal_infos = [
-    PersonalInfo(1, 'Tara B. Anderson', '1799 Saint Clair Street', '662-595-9340', 'TaraBAnderson@jourrapide.com', 'Chief Technical Officer', 'Top Management', 3950),
-    PersonalInfo(2, 'Norman A. Mack', '3219 Brown Street', '925-934-3697', 'NormanAMack@rhyta.com', 'Solution Architect', 'Top Management', 4050),
-    PersonalInfo(3, 'Micheal P. Anderson', '4104 Gateway Avenue', '661-902-2802', 'MichealPAnderson@armyspy.com', 'Solution Architect', 'Top Management', 3100),
-    PersonalInfo(4, 'Justin M. Cofield', '4609 Cecil Street', '312-297-3347', 'JustinMCofield@armyspy.com', 'Python Developer', 'Lead', 2900)
+    PersonalInfo(1, 'Tara B. Anderson', '1799 Saint Clair Street', '662-595-9340', 'TaraBAnderson@jourrapide.com', 'Python Developer', 'Middle', 1950),
+    PersonalInfo(2, 'Norman A. Mack', '3219 Brown Street', '925-934-3697', 'NormanAMack@rhyta.com', 'Python Developer', 'Junior', 1250),
+    PersonalInfo(3, 'Micheal P. Anderson', '4104 Gateway Avenue', '661-902-2802', 'MichealPAnderson@armyspy.com', 'Solution Architect', 'Top Management', 4100),
+    PersonalInfo(4, 'Justin M. Cofield', '4609 Cecil Street', '312-297-3347', 'JustinMCofield@armyspy.com', 'Senior Solution Architect', 'Top Management', 6900),
+    PersonalInfo(5, 'Ronald T. Guertin', '419 Carter Street', '618-798-7506', 'RonaldTGuertin@rhyta.com', 'Python Developer', 'Lead', 2900)
 ]
 
-top_managers = [
-    ChiefTechnicalOfficer(personal_infos[0]),
-    SolutionArchitect(personal_infos[1]),
-    SolutionArchitect(personal_infos[2])
+developers = [
+    Developer(personal_infos[0]),
+    Developer(personal_infos[1])
 ]
 
-team = Team(1, 'Team One', [4, 5, 6, 7, 8], ddl, [])
+developers_tasks = {
+    developers[0]: Task(1, 'Task One', datetime.date(2021, 10, 25), None),
+    developers[1]: Task(2, 'Task Two', datetime.date(2021, 10, 28), None)
+}
 
-team_lead = TeamLead(personal_infos[3])
+solution_architect = SolutionArchitect(personal_infos[2])
+senior_solution_architect = SeniorSolutionArchitect(personal_infos[3])
 
-projects = [
-    *top_managers[0].fill_project(team_lead, 1, 'Project One', datetime.date(2021, 10, 1), team, ['Step 1', 'Step 2', 'Step 3']),
-    *top_managers[1].fill_project(team_lead, 2, 'Project Two', datetime.date(2021, 10, 2), team, 'Heroku', ['IOS', 'Android']),
-    *top_managers[2].fill_project(team_lead, 3, 'Project Three', datetime.date(2021, 10, 3), team, 'AWS', ['Chrome OS', 'Tizen']),
-]
+team = Team(1, 'Team One', [1, 2, 5], ddl, [])
+
+team_lead = TeamLead(personal_infos[4])
+
+projects = senior_solution_architect.fill_project(team_lead, solution_architect, 1, 'Project One', datetime.date(2021, 10, 20), team, 
+    'Heroku', ['IOS', 'Android'], developers, developers_tasks)
 
 import json
 

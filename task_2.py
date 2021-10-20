@@ -1,149 +1,109 @@
-from dataclasses import dataclass
-from abc import ABC, ABCMeta, abstractmethod
+import copy
 
 
-@dataclass
-class Customization:
-    extra_milk: float
-    sugar: float
-    mug_size: float
+class Account:
+    def __init__(self, account_id: int, customer_id: int) -> None:
+        self.id = account_id
+        self.customer_id = customer_id
 
 
-@dataclass
-class Preparation:
-    milk: float
-    water: float
-    sugar: float
-    coke: float
-    liquid_coffee: float
-    added_flavour: float
-    tea: float
+class Checking(Account):
+    pass
 
 
-class Product(metaclass=ABCMeta):
-    def __init__(self, cust: Customization) -> None:
-        self.cust = cust
-        self.prep = Preparation(0, 0, 0, 0, 0, 0, 0)
-        self.make()
+class Savings(Account):
+    pass
 
-    @abstractmethod
-    def make() -> None:
+
+class Loan:
+    def __init__(self, loan_id: int, type: str, account_id: int, customer_id: int):
+        self.id = loan_id
+        self.type = type
+        self.account_id = account_id
+        self.customer_id = customer_id
+
+
+class Teller:
+    def __init__(self, teller_id: int, name: str, bank):
+        self.id = teller_id
+        self.name = name
+        self.bank = bank
+
+    def collect_money():
+        pass
+
+    def open_account(self, customer, account_id: int):
+        if account_id not in customer.accounts:
+            customer.accounts[account_id] = Account(account_id, customer.id)
+
+    def close_account(self, customer, account_id: int):
+        if account_id in customer.accounts:
+            del customer.accounts[account_id]
+
+    def loan_request(self, customer, loan_id: int, loan_type: str, account_id: int):
+        self.open_account(customer, account_id)
+        if loan_id not in customer.loans:
+            customer.loans[loan_id] = Loan(loan_id, loan_type, account_id, customer.id)
+
+    def provide_info():
+        pass
+
+    def issue_card():
         pass
 
 
-class Cappuccino(Product):
-    def make(self) -> None:
-        self.set_milk()
-        self.set_sugar()
-        self.set_coffee()
-
-    def set_milk(self) -> None:
-        self.prep.milk = 0.475
-
-    def set_sugar(self) -> None:
-        self.prep.sugar = 0.05
-
-    def set_coffee(self) -> None:
-        self.prep.liquid_coffee = 0.475
+class Bank:
+    def __init__(self, bank_id: int, name: str, location: str):
+        self.id = bank_id
+        self.name = name
+        self.location = location
+        
+        self.tellers = []
+        self.customers = []
 
 
-class BlackCoffee(Product):
-    def make(self) -> None:
-        self.set_water()
-        self.set_coffee()
+class Customer:
+    def __init__(self, customer_id: int, name: str, address: str, phone_number: int, bank: Bank):
+        self.id = customer_id
+        self.name = name
+        self.address = address
+        self.phone_number = phone_number
 
-    def set_water(self) -> None:
-        self.prep.water = 0.5
+        self.bank = bank
+        self.accounts = {}
+        self.loans = {}
 
-    def set_coffee(self) -> None:
-        self.prep.liquid_coffee = 0.5
-
-
-class Lemonade(Product):
-    def make(self) -> None:
-        self.set_water()
-        self.set_sugar()
-        self.set_lemon_juice()
-
-    def set_water(self) -> None:
-        self.prep.water = 0.4
-
-    def set_sugar(self) -> None:
-        self.prep.sugar = 0.2
-
-    def set_lemon_juice(self) -> None:
-        self.prep.added_flavour = 0.4
-
-
-class HotMilk(Product):
-    def make(self) -> None:
-        self.set_milk()
-
-    def set_milk(self) -> None:
-        self.prep.milk = 1
-    
-
-class CocaCola(Product):
-    def make(self) -> None:
-        self.set_water()
-        self.set_coke()
-
-    def set_water(self) -> None:
-        self.prep.water = 0.3
-
-    def set_coke(self) -> None:
-        self.prep.coke = 0.7
-
-
-class ProductFactory(metaclass=ABCMeta):
-    @abstractmethod
-    def get_product(self, customization: Customization) -> Product:
+    def general_inquiry():
         pass
 
-    @staticmethod
-    def get_product_factory(factory_type: str):
-        if factory_type == 'Cappuccino':
-            return CappuccinoFactory()
-        elif factory_type == 'BlackCoffee':
-            return BlackCoffeeFactory()
-        elif factory_type == 'Lemonade':
-            return LemonadeFactory()
-        elif factory_type == 'HotMilk':
-            return HotMilkFactory()
-        elif factory_type == 'CocaCola':
-            return CocaColaFactory()
-        else:
-            return None
+    def deposit_money():
+        pass
 
+    def withdraw_money():
+        pass
 
-class CappuccinoFactory(ProductFactory):
-    def get_product(self, customization: Customization) -> Product:
-        return Cappuccino(customization)
+    def open_account(self, teller: Teller, account_id: int):
+        teller.open_account(self, account_id)
 
+    def close_account(self, teller: Teller, account_id: int):
+        teller.close_account(self, account_id)
 
-class BlackCoffeeFactory(ProductFactory):
-    def get_product(self, customization: Customization) -> Product:
-        return BlackCoffee(customization)
+    def apply_for_loan(self, teller: Teller, loan_id: int, loan_type: str, account_id: int):
+        teller.loan_request(self, loan_id, loan_type, account_id)
 
+    def request_card():
+        pass
 
-class LemonadeFactory(ProductFactory):
-    def get_product(self, customization: Customization) -> Product:
-        return Lemonade(customization)
+    def __copy__(self):
+        customer = Customer(self.id, self.name, self.address, self.phone_number, self.bank)
+        customer.accounts = self.accounts
+        customer.loans = self.loans
 
+        return customer
 
-class HotMilkFactory(ProductFactory):
-    def get_product(self, customization: Customization) -> Product:
-        return HotMilk(customization)
+    def __deepcopy__(self, memo):
+        customer = Customer(self.id, self.name, self.address, self.phone_number, copy.deepcopy(self.bank, memo))
+        customer.accounts = copy.deepcopy(self.accounts, memo)
+        customer.loans = copy.deepcopy(self.loans, memo)
 
-
-class CocaColaFactory(ProductFactory):
-    def get_product(self, customization: Customization) -> Product:
-        return CocaCola(customization)
-
-
-def client(factory_type: str, customization: Customization) -> Product:
-    product_factory = ProductFactory.get_product_factory(factory_type)
-    if product_factory is not None:
-        return product_factory.get_product(customization)
-    else:
-        return None
+        return customer
