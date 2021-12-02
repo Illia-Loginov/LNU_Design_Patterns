@@ -1,0 +1,17 @@
+{
+  "name": "lab_7",
+  "version": "1.0.0",
+  "description": "LNU (3 semester) Design Patterns - Lab 7",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Illia Loginov",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "mongoose": "^6.0.13"
+  }
+}

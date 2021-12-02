@@ -1,0 +1,51 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: sans-serif;
+}
+
+.main {
+    max-width: 600px;
+    margin: 50px auto;
+}
+
+.display {
+    text-align: center;
+    margin: 20px; 
+}
+
+.form {
+    margin: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.input {
+    flex: 1;
+}
+
+.input, .button {
+    padding: 5px 10px;
+    font-family: inherit;
+    background: white;
+    border: 2px solid lightgray;
+}
+
+.input:not(:last-child), .button:not(:last-child) {
+    margin-right: 10px;
+}
+
+.input:focus, .button:focus {
+    outline: none;
+    border: 2px solid gray;
+}
+
+.error {
+    text-align: center;
+    margin: 20px; 
+    color: crimson;
+}

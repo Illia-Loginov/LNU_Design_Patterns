@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css">
+    <title>Lab 7</title>
+</head>
+<body>
+    <main class="main">
+        <% if(user) { %>
+            <p class="display">ID: <%= user._id %></p>
+            <% if(balance) { %>
+                <p class="display">Balance: <%= balance %></p>
+            <% } %>
+            <form class="form" action="/atm/withdrawal" method="POST">
+                <input 
+                class="input"
+                type="text" 
+                name="amount" 
+                id="amount"
+                placeholder="Amount"
+                >
+                <input name="account_id" id="account_id" type="text" value="<%= user._id %>" hidden>
+                <button class="button">Withdraw</button>
+            </form>
+
+            <form class="form" action="/atm/balance" method="POST">
+                <input name="account_id" id="account_id" type="text" value="<%= user._id %>" hidden>
+                <button class="button">Balance</button>
+            </form>
+
+            <form class="form" action="/atm/logout" method="GET">
+                <button class="button">Log Out</button>
+            </form>
+        <% } else { %> 
+            <form class="form" action="/atm/login" method="POST">
+                <input 
+                class="input"
+                type="text" 
+                name="account_id" 
+                id="account_id"
+                placeholder="Account ID"
+                >
+                <button class="button">Log In</button>
+            </form>
+
+            <form class="form" action="/atm/signup" method="POST">
+                <button class="button">Sign Up</button>
+            </form>
+        <% } %>  
+
+        <% if(error !== undefined) { %>
+            <p class="error"><%= error %></p> 
+        <% } %> 
+    </main>
+</body>
+</html>
