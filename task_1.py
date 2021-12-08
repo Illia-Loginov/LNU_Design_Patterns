@@ -34,6 +34,18 @@ class DatabaseAPI(Software):
         self.database = database
 
 
+class Containerization(Software):
+    def __init__(self, content, dependencies):
+        self.content = content
+        self.dependencies = dependencies
+
+
+class Deployment(Software):
+    def __init__(self, app, system):
+        self.app = app
+        self.system = system
+
+
 class Employee(metaclass=ABCMeta):
     def __init__(self, name: str):
         self.name = name
@@ -168,6 +180,12 @@ class SoftwareDevelopmentFacade:
             self.app = WebApp(*args)
         elif type == 'api':
             self.app = DatabaseAPI(*args)
+        elif type == 'container':
+            self.app = Containerization(*args)
+        elif type == 'deploy':
+            self.app = Deployment(*args)
+        else:
+            return None
 
         feature_count = self.business_analyst.distribute_budget(budget)
         self.software_architect.design_features(self.app, feature_count)
